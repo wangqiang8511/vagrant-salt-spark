@@ -19,7 +19,7 @@ install_scala:
   cmd.run:
     - name: "tar -zxf /var/scala/scala_source.tgz -C /usr/share" 
     - require: 
-      - file.managed: install_scala
+      - file: install_scala
     - unless: "[ -d /usr/share/scala-2.9.3 ]" 
 
 install_sbt:
@@ -32,7 +32,7 @@ install_sbt:
   cmd.run:
     - name: "tar -zxf /var/sbt/sbt.tgz -C /usr/share" 
     - require: 
-      - file.managed: install_sbt
+      - file: install_sbt
     - unless: "[ -d /usr/share/sbt ]" 
 
 link_scala:
@@ -42,23 +42,23 @@ link_scala:
     - makedirs: True
     - source: salt://spark/files/link_scala.sh
     - require:
-      - cmd.run: install_scala
+      - cmd: install_scala
   cmd.run:
     - name: "/var/scala/link_scala.sh" 
     - require: 
-      - file.managed: link_scala
+      - file: link_scala
     - unless: "[ -e /usr/bin/scala ]"
 
 link_sbt:
   cmd.run:
     - name: "ln -s /usr/share/sbt/bin/sbt /usr/bin/sbt" 
     - require: 
-      - cmd.run: install_sbt
+      - cmd: install_sbt
     - unless: "[ -e /usr/bin/sbt ]"
 
 build_spark:
   cmd.run:
     - name: "cd {{ spark_home }} && ./sbt/sbt assembly"
     - require:
-      - cmd.run: link_scala
-      - git.latest: spark_git
+      - cmd: link_scala
+      - git: spark_git
